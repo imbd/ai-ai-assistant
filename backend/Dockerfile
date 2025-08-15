@@ -52,11 +52,10 @@ USER appuser
 # This is used by UV and Python for caching packages and bytecode
 RUN mkdir -p /home/appuser/.cache
 
-# Install Python dependencies using UV's lock file
-# --locked ensures we use exact versions from uv.lock for reproducible builds
+# Install Python dependencies using UV
+# If you commit uv.lock, you can switch to 'uv sync --locked' for reproducible builds
 # This creates a virtual environment and installs all dependencies
-# Ensure your uv.lock file is checked in for consistency across environments
-RUN uv sync --locked
+RUN uv sync
 
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
