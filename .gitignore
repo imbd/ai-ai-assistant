@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# Node/Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+
+# Python
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+
+# Env files
+.env
+*.env
+backend/.env*
+frontend/.env*
+
+# IDE
+.idea/
+.vscode/
