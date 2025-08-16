@@ -31,12 +31,13 @@ interface SessionViewProps {
   sessionStarted: boolean;
 }
 
-export const SessionView = ({
-  appConfig,
-  disabled,
-  sessionStarted,
-  ref,
-}: React.ComponentProps<'div'> & SessionViewProps) => {
+export const SessionView = React.forwardRef<
+  HTMLElement,
+  React.ComponentProps<'main'> & SessionViewProps
+>(function SessionView(
+  { appConfig, disabled, sessionStarted, className, ...rest },
+  ref
+) {
   const { state: agentState } = useVoiceAssistant();
   const [chatOpen, setChatOpen] = useState(false);
   const { messages, send } = useChatAndTranscription();
@@ -145,12 +146,14 @@ export const SessionView = ({
   return (
     <main
       ref={ref}
-      inert={disabled}
-      className={
+      {...({ inert: disabled } as any)}
+      className={cn(
         // prevent page scrollbar
         // when !chatOpen due to 'translate-y-20'
-        cn(!chatOpen && 'max-h-svh overflow-hidden')
-      }
+        !chatOpen && 'max-h-svh overflow-hidden',
+        className
+      )}
+      {...rest}
     >
       <div className="mx-auto grid min-h-svh w-full max-w-5xl grid-cols-1 gap-6 px-3 pt-32 pb-40 md:grid-cols-[220px_1fr] md:px-0 md:pt-36 md:pb-48">
         <div className="md:sticky md:top-36 md:z-10 hidden md:block">
@@ -263,4 +266,4 @@ export const SessionView = ({
       </div>
     </main>
   );
-};
+});

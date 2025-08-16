@@ -22,6 +22,11 @@ export function App({ appConfig }: AppProps) {
   const room = useMemo(() => new Room(), []);
   const [sessionStarted, setSessionStarted] = useState(false);
   const { connectionDetails, refreshConnectionDetails } = useConnectionDetails();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     const onDisconnected = () => {
@@ -76,15 +81,20 @@ export function App({ appConfig }: AppProps) {
 
   return (
     <>
-      <MotionWelcome
-        key="welcome"
-        startButtonText={startButtonText}
-        onStartCall={() => setSessionStarted(true)}
-        disabled={sessionStarted}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: sessionStarted ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: 'linear', delay: sessionStarted ? 0 : 0.5 }}
-      />
+      {isHydrated && !sessionStarted && (
+        <MotionWelcome
+          key="welcome"
+          startButtonText={startButtonText}
+          onStartCall={() => setSessionStarted(true)}
+          disabled={sessionStarted}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: sessionStarted ? 0 : 1 }}
+          transition={{ duration: 0.5, ease: 'linear', delay: sessionStarted ? 0 : 0.5 }}
+          // Ensure SSR matches intended visibility to avoid hydration flash
+          style={{ opacity: sessionStarted ? 0 : 1, pointerEvents: sessionStarted ? 'none' : 'auto' }}
+          aria-hidden={sessionStarted}
+        />
+      )}
 
       <RoomContext.Provider value={room}>
         <RoomAudioRenderer />
@@ -102,6 +112,9 @@ export function App({ appConfig }: AppProps) {
             ease: 'linear',
             delay: sessionStarted ? 0.5 : 0,
           }}
+          // Ensure SSR matches intended visibility to avoid hydration flash
+          style={{ opacity: sessionStarted ? 1 : 0 }}
+          aria-hidden={!sessionStarted}
         />
       </RoomContext.Provider>
 
