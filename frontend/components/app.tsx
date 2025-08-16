@@ -18,10 +18,13 @@ interface AppProps {
   appConfig: AppConfig;
 }
 
+type Mode = 'lesson' | 'copilot';
+
 export function App({ appConfig }: AppProps) {
   const room = useMemo(() => new Room(), []);
   const [sessionStarted, setSessionStarted] = useState(false);
-  const { connectionDetails, refreshConnectionDetails } = useConnectionDetails();
+  const [mode, setMode] = useState<Mode | null>(null);
+  const { connectionDetails } = useConnectionDetails(mode ?? undefined);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export function App({ appConfig }: AppProps) {
   useEffect(() => {
     const onDisconnected = () => {
       setSessionStarted(false);
-      refreshConnectionDetails();
+      setMode(null);
     };
     const onMediaDevicesError = (error: Error) => {
       toastAlert({
@@ -45,7 +48,14 @@ export function App({ appConfig }: AppProps) {
       room.off(RoomEvent.Disconnected, onDisconnected);
       room.off(RoomEvent.MediaDevicesError, onMediaDevicesError);
     };
-  }, [room, refreshConnectionDetails]);
+  }, [room]);
+
+  // Begin the session only once we have connection details for the chosen mode
+  useEffect(() => {
+    if (mode && connectionDetails && !sessionStarted) {
+      setSessionStarted(true);
+    }
+  }, [mode, connectionDetails, sessionStarted]);
 
   useEffect(() => {
     let aborted = false;
@@ -57,11 +67,6 @@ export function App({ appConfig }: AppProps) {
         room.connect(connectionDetails.serverUrl, connectionDetails.participantToken),
       ]).catch((error) => {
         if (aborted) {
-          // Once the effect has cleaned up after itself, drop any errors
-          //
-          // These errors are likely caused by this effect rerunning rapidly,
-          // resulting in a previous run `disconnect` running in parallel with
-          // a current run `connect`
           return;
         }
 
@@ -73,9 +78,22 @@ export function App({ appConfig }: AppProps) {
     }
     return () => {
       aborted = true;
-      room.disconnect();
+      if (room.state !== 'disconnected') {
+        room.disconnect();
+      }
     };
   }, [room, sessionStarted, connectionDetails, appConfig.isPreConnectBufferEnabled]);
+
+  const handleEndSession = async () => {
+    try {
+      if (room.state !== 'disconnected') {
+        await room.disconnect();
+      }
+    } finally {
+      setSessionStarted(false);
+      setMode(null);
+    }
+  };
 
   const { startButtonText } = appConfig;
 
@@ -85,7 +103,12 @@ export function App({ appConfig }: AppProps) {
         <MotionWelcome
           key="welcome"
           startButtonText={startButtonText}
-          onStartCall={() => setSessionStarted(true)}
+          onStartLesson={() => {
+            setMode('lesson');
+          }}
+          onStartCopilot={() => {
+            setMode('copilot');
+          }}
           disabled={sessionStarted}
           initial={{ opacity: 0 }}
           animate={{ opacity: sessionStarted ? 0 : 1 }}
@@ -103,8 +126,10 @@ export function App({ appConfig }: AppProps) {
         <MotionSessionView
           key="session-view"
           appConfig={appConfig}
+          mode={(mode ?? 'lesson') as Mode}
           disabled={!sessionStarted}
           sessionStarted={sessionStarted}
+          onEndSession={handleEndSession}
           initial={{ opacity: 0 }}
           animate={{ opacity: sessionStarted ? 1 : 0 }}
           transition={{

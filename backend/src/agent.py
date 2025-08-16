@@ -37,9 +37,10 @@ load_dotenv(".env")
 
 
 class Assistant(Agent):
-    def __init__(self) -> None:
+    def __init__(self, instructions: str | None = None) -> None:
         super().__init__(
-            instructions="""You are a helpful voice AI assistant.
+            instructions=instructions
+            or """You are a helpful voice AI assistant.
             Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
             You are curious, friendly, and have a sense of humor.
 
@@ -170,6 +171,11 @@ async def entrypoint(ctx: JobContext):
     ctx.proc.userdata["session_id"] = session_id
     logger.info("new session started: session_id=%s", session_id)
 
+    # Determine mode from room name prefix
+    room_name = ctx.room.name or ""
+    mode = "copilot" if room_name.startswith("copilot_") else "lesson"
+    logger.info("detected mode from room name: %s", mode)
+
     # Set up a voice AI pipeline. If PORTKEY_API_KEY is set, route LLM via Portkey.
     portkey_api_key = os.getenv("PORTKEY_API_KEY")
     if portkey_api_key:
@@ -186,7 +192,7 @@ async def entrypoint(ctx: JobContext):
         if upstream_openai:
             headers["x-portkey-openai-api-key"] = upstream_openai
         # Attach Portkey metadata: include session_id so requests can be grouped per conversation
-        headers["x-portkey-metadata"] = json.dumps({"session_id": session_id})
+        headers["x-portkey-metadata"] = json.dumps({"session_id": session_id, "mode": mode})
         # Build a custom AsyncClient so we can inject Portkey headers
         http_client = httpx.AsyncClient(
             timeout=httpx.Timeout(connect=15.0, read=5.0, write=5.0, pool=5.0),
@@ -329,8 +335,44 @@ async def entrypoint(ctx: JobContext):
     # await avatar.start(session, room=ctx.room)
 
     # Start the session, which initializes the voice pipeline and warms up the models
+    copilot_instructions = (
+        """You are a helpful AI copilot for using ChatGPT together. Keep replies short and practical.
+        You have an extensive knowledge of ChatGPT and can help the user with their tasks and questions.
+        Ask the user to open the chatgpt.com website and share their screen as it will help you help them better (your app has a standard video call inerface with "Share screen" button). If not shared, you can still help them with effecient tackling of any tasks and questions within ChatGPT.
+        After user shares their screen or declines to share it, you can start the conversation. 
+
+        ** GENERAL RULES, VERY IMPORTANT **
+        -- Don't spit out a lot of text at once: not more than 1-2 sentences at once -- and then wait for the user to reply (ask a question or ask for them to do something to make it fun, conversational and interactive).
+        -- After asking a question, stop speaking and wait for the user to reply.
+        -- Avoid lesson status tools (they won't work in this mode).
+        -- Note: you don't help user to complete their task, you help them do it efficiently by giving them prompts and navigating them to the right tools and modes of ChatGPT.
+        -- When giving prompts, make sure to use the update_prompt tool and ask the user to copy the prompt from the conversation interface (not ChatGPT!).
+
+        ** INTERACTION GUIDELINES **
+        1. Ask the user about their current tasks. If user has multiple tasks, you can help prioritize them: come up with a plan which makes the whole session the most effective: for instance, if some task requires a deep research, you can suggest starting it first and then tackling other tasks in parallel.
+        2. After receiving the answer, propose a specific mode to use for the task. Also, if appliacble, offer well-crafted prompts using the update_prompt tool. 
+        3. Help the user with the task. Note: if you've started a deep research or another mode that takes a long time, you can ask if there are any tasks to complete as well in parallel.
+        4. After the task is completed, ask the user if they have any other tasks or questions. If yes, go to step 1. If no, go to step 5.
+        5. If the user has no other tasks or questions, thank them for the conversation and say goodbye.
+
+        **CHATGPT MODE SELECTION**
+        - Standard Chat: simple Q&A, quick web search or quick drafting. How to find: main page of chatgpt.com
+        - Study mode: teach step‑by‑step and check understanding. How to find: under plus button in every chat. Examples: Exam prep plan, Language workout, etc.
+        - Deep Research: multi‑step, source‑cited reports. Use when the user wants depth or a brief they can reuse. Typical runtime: several to ~30 minutes. How to find: under plus button in every chat. Examples: Big buy decision, Market scan, etc.
+        - Agent mode: when action is needed (browse, fill forms, edit sheets, generate files). Typical runtime: ~5–30 minutes. How to find: under plus button in every chat. Examples: Trip planner, Theme dinner party end-to-end, etc.
+
+
+        **ChatGPT Models**
+        - GPT-5 Auto: Default router that picks Fast or Thinking per prompt. Use when you want the best answer without manual switching.
+        - GPT-5 Fast: Low-latency “instant answers.” Use for everyday tasks and quick turnarounds. 
+        - GPT-5 Thinking mini: Lightweight reasoning mode. Use when you need some chain-of-thought depth but want speed.
+        - GPT-5 Thinking: Deeper reasoning mode. Use for complex coding, analysis, or synthesis where accuracy matters more than speed.
+        - GPT-5 Pro: Extended, research-grade intelligence. Use for the most demanding analyses and long contexts on Pro/Team tiers.
+        """
+    )
+    agent = Assistant(instructions=copilot_instructions) if mode == "copilot" else Assistant()
     await session.start(
-        agent=Assistant(),
+        agent=agent,
         room=ctx.room,
         room_input_options=RoomInputOptions(
             # LiveKit Cloud enhanced noise cancellation
@@ -344,7 +386,8 @@ async def entrypoint(ctx: JobContext):
     await ctx.connect()
 
     # Proactive greeting at session start
-    await session.say("Hi! Ready?", allow_interruptions=False)
+    greeting = "Pair Mode activated! What do you want to do?" if mode == "copilot" else "Hi! Ready for a quick learning session?"
+    await session.say(greeting, allow_interruptions=False)
 
 
 if __name__ == "__main__":

@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 interface WelcomeProps {
   disabled: boolean;
   startButtonText: string;
-  onStartCall: () => void;
+  onStartLesson: () => void;
+  onStartCopilot: () => void;
 }
 
 export const Welcome = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'> & WelcomeProps>(
   function Welcome(
-    { disabled, startButtonText, onStartCall, className, ...rest },
+    { disabled, startButtonText, onStartLesson, onStartCopilot, className, ...rest },
     ref
   ) {
     return (
@@ -40,9 +41,14 @@ export const Welcome = React.forwardRef<HTMLDivElement, React.ComponentProps<'di
         <h1 className="text-fg1 max-w-prose pt-1 font-semibold leading-tight text-2xl md:text-3xl">
           Use ChatGPT effectively and safely
         </h1>
-        <Button variant="primary" size="lg" onClick={onStartCall} className="mt-6 w-64 font-mono">
-          {startButtonText}
-        </Button>
+        <div className="mt-6 flex w-64 flex-col gap-3">
+          <Button variant="primary" size="lg" onClick={onStartLesson} className="w-64 font-mono">
+          Start Guided Lesson
+          </Button>
+          <Button variant="secondary" size="lg" onClick={onStartCopilot} className="w-64 font-mono">
+            Pair Mode
+          </Button>
+        </div>
         <p className="text-fg1 m fixed bottom-5 left-1/2 w-full max-w-prose -translate-x-1/2 pt-1 text-xs leading-5 font-normal text-pretty md:text-sm">
           Need help getting set up? Check out the{' '}
           <a

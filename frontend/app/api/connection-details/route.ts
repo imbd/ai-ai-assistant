@@ -18,7 +18,7 @@ export type ConnectionDetails = {
   participantToken: string;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     if (LIVEKIT_URL === undefined) {
       throw new Error('LIVEKIT_URL is not defined');
@@ -30,10 +30,13 @@ export async function GET() {
       throw new Error('LIVEKIT_API_SECRET is not defined');
     }
 
+    const url = new URL(request.url);
+    const modeParam = url.searchParams.get('mode') === 'copilot' ? 'copilot' : 'lesson';
+
     // Generate participant token
     const participantName = 'user';
     const participantIdentity = `voice_assistant_user_${Math.floor(Math.random() * 10_000)}`;
-    const roomName = `voice_assistant_room_${Math.floor(Math.random() * 10_000)}`;
+    const roomName = `${modeParam}_${Math.floor(Math.random() * 10_000)}`;
     const participantToken = await createParticipantToken(
       { identity: participantIdentity, name: participantName },
       roomName

@@ -29,13 +29,15 @@ interface SessionViewProps {
   appConfig: AppConfig;
   disabled: boolean;
   sessionStarted: boolean;
+  mode: 'lesson' | 'copilot';
+  onEndSession?: () => void;
 }
 
 export const SessionView = React.forwardRef<
   HTMLElement,
   React.ComponentProps<'main'> & SessionViewProps
 >(function SessionView(
-  { appConfig, disabled, sessionStarted, className, ...rest },
+  { appConfig, disabled, sessionStarted, mode, onEndSession, className, ...rest },
   ref
 ) {
   const { state: agentState } = useVoiceAssistant();
@@ -72,7 +74,7 @@ export const SessionView = React.forwardRef<
           setSections((prev) => {
             const next = prev.map((s) => (s.id === msg.id ? { ...s, status: msg.status } : s));
             // Auto-advance: when a section becomes complete, mark the next pending as active
-            if (msg.status === 'complete') {
+            if (msg.status === 'completed') {
               const idx = next.findIndex((s) => s.id === msg.id);
               const nextIdx = idx >= 0 ? idx + 1 : -1;
               if (nextIdx >= 0 && nextIdx < next.length && next[nextIdx].status === 'pending') {
@@ -128,12 +130,13 @@ export const SessionView = React.forwardRef<
             ),
           });
           room.disconnect();
+          onEndSession?.();
         }
       }, 10_000);
 
       return () => clearTimeout(timeout);
     }
-  }, [agentState, sessionStarted, room]);
+  }, [agentState, sessionStarted, room, onEndSession]);
 
   const { supportsChatInput, supportsVideoInput, supportsScreenShare } = appConfig;
   const capabilities = {
@@ -156,7 +159,7 @@ export const SessionView = React.forwardRef<
     >
       <div className="mx-auto grid min-h-svh w-full max-w-5xl grid-cols-1 gap-6 px-3 pt-32 pb-40 md:grid-cols-[220px_1fr] md:px-0 md:pt-36 md:pb-48">
         <div className="md:sticky md:top-36 md:z-10 hidden md:block">
-          <ConversationStatus sections={sections} />
+          {mode === 'lesson' && <ConversationStatus sections={sections} />}
           {promptText !== '' && (
             <div className="mt-8">
               <div className="flex items-center justify-between gap-3">
@@ -248,7 +251,7 @@ export const SessionView = React.forwardRef<
                 )}
               >
                 <p className="animate-text-shimmer inline-block !bg-clip-text text-sm font-semibold text-transparent">
-                  Agent is listening, ask it a question
+                  Agent is listening
                 </p>
               </motion.div>
             )}
@@ -257,6 +260,7 @@ export const SessionView = React.forwardRef<
               capabilities={capabilities}
               onChatOpenChange={setChatOpen}
               onSendMessage={handleSendMessage}
+              onDisconnect={onEndSession}
             />
           </div>
           {/* skrim */}

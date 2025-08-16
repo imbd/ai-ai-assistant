@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ConnectionDetails } from '@/app/api/connection-details/route';
 
-export default function useConnectionDetails() {
+export default function useConnectionDetails(mode?: 'lesson' | 'copilot') {
   // Generate room connection details, including:
   //   - A random Room name
   //   - A random Participant name
@@ -19,6 +19,9 @@ export default function useConnectionDetails() {
       process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details',
       window.location.origin
     );
+    if (mode) {
+      url.searchParams.set('mode', mode);
+    }
     fetch(url.toString())
       .then((res) => res.json())
       .then((data) => {
@@ -27,11 +30,13 @@ export default function useConnectionDetails() {
       .catch((error) => {
         console.error('Error fetching connection details:', error);
       });
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
-    fetchConnectionDetails();
-  }, [fetchConnectionDetails]);
+    if (mode) {
+      fetchConnectionDetails();
+    }
+  }, [fetchConnectionDetails, mode]);
 
   return { connectionDetails, refreshConnectionDetails: fetchConnectionDetails };
 }
