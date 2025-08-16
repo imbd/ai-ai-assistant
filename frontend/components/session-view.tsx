@@ -45,10 +45,9 @@ export const SessionView = React.forwardRef<
 
   const createInitialSections = (): ConversationSection[] => ([
     { id: '0', title: 'Introduction', status: 'active' },
-    { id: '1', title: 'Lesson 1: Personalization', status: 'pending' },
-    { id: '2', title: 'Part 3: Safety', status: 'pending' },
-    { id: '3', title: 'Part 4: Memory', status: 'pending' },
-    { id: '4', title: 'Part 5: Verification', status: 'pending' },
+    { id: '1', title: 'Lesson 1: AI Alignment', status: 'pending' },
+    { id: '2', title: 'Lesson 2: Critical Thinking', status: 'pending' },
+    { id: '3', title: 'Wrap-up', status: 'pending' },
   ]);
 
   const [sections, setSections] = useState<ConversationSection[]>(createInitialSections());
@@ -161,7 +160,7 @@ export const SessionView = React.forwardRef<
           {promptText !== '' && (
             <div className="mt-8">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold tracking-wide text-fg1 uppercase">Suggested prompt</h2>
+                <h2 className="text-sm font-semibold tracking-wide text-fg1 uppercase">Prompt</h2>
                 <button
                   type="button"
                   className="group inline-flex items-center gap-1 rounded-md border border-fg2/40 px-2 py-1 text-xs font-medium text-fg1 hover:bg-fg2/10"

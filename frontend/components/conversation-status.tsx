@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type ConversationSectionStatus = 'pending' | 'active' | 'complete';
+export type ConversationSectionStatus = 'pending' | 'active' | 'completed';
 
 export interface ConversationSection {
 	id: string;
@@ -19,7 +19,7 @@ export function ConversationStatus({ sections, className }: ConversationStatusPr
 			<h2 className="text-sm font-semibold tracking-wide text-fg1 uppercase">Conversation status</h2>
 			<ol className="mt-3 space-y-2">
 				{sections.map((section) => {
-					const isComplete = section.status === 'complete';
+					const isComplete = section.status === 'completed';
 					const isActive = section.status === 'active';
 					return (
 						<li key={section.id} className="flex items-center gap-3 text-base">
