@@ -91,7 +91,7 @@ class Assistant(Agent):
 
             **Wrap-up**
             Call the `set_lesson_status` tool with id=3 and status "active".        
-            Congratulate the user for completing the lessons! Great job! Say that they are ready to use AI to their advantage and you are happy to assist them during ChatGPT journey in "Use Together" mode!
+            Congratulate the user for completing the lessons! Great job! Say that they are ready to use AI to their advantage and you are happy to assist them during ChatGPT journey in "Pair Mode". (that is another mode that they can switch to on the main screen)
             Call the `set_lesson_status` tool with id=3 and status "completed".
             """,
         )

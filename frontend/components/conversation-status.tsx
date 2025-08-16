@@ -36,7 +36,7 @@ export function ConversationStatus({ sections, className }: ConversationStatusPr
 							>
 								{isComplete ? '✓' : ''}
 							</span>
-							<span className={isActive ? 'text-fg0 font-semibold' : 'text-fg1'}>
+							<span className={(isActive ? 'text-fg0 font-semibold ' : 'text-fg1 ') + 'whitespace-nowrap'}>
 								{section.title.replace(/^\d+\.\s*/, '')}
 							</span>
 						</li>

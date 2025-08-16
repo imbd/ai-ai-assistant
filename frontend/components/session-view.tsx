@@ -157,7 +157,7 @@ export const SessionView = React.forwardRef<
       )}
       {...rest}
     >
-      <div className="mx-auto grid min-h-svh w-full max-w-5xl grid-cols-1 gap-6 px-3 pt-32 pb-40 md:grid-cols-[220px_1fr] md:px-0 md:pt-36 md:pb-48">
+      <div className="mx-auto grid min-h-svh w-full max-w-5xl grid-cols-1 gap-6 px-3 pt-32 pb-40 md:grid-cols-[300px_1fr] md:px-0 md:pt-36 md:pb-48">
         <div className="md:sticky md:top-36 md:z-10 hidden md:block">
           {mode === 'lesson' && <ConversationStatus sections={sections} />}
           {promptText !== '' && (
