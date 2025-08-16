@@ -385,6 +385,37 @@ async def entrypoint(ctx: JobContext):
     # Join the room and connect to the user
     await ctx.connect()
 
+    # Schedule an auto-timeout to end the conversation after a configurable duration
+    timeout_seconds = float(os.getenv("CONVERSATION_TIMEOUT_SECONDS", "300"))
+    timeout_message = os.getenv(
+        "CONVERSATION_TIMEOUT_MESSAGE",
+        "Time's up! Ending the session now. You can reconnect if you'd like to continue.",
+    )
+
+    async def _conversation_timeout_task() -> None:
+        try:
+            await asyncio.sleep(timeout_seconds)
+            logger.info("conversation timeout reached; initiating shutdown", extra={"timeout_seconds": timeout_seconds})
+            try:
+                await session.say(timeout_message, allow_interruptions=False)
+            except Exception:
+                logger.exception("failed to deliver timeout message before shutdown")
+            await ctx.shutdown(reason=f"conversation timeout ({int(timeout_seconds)}s)")
+        except asyncio.CancelledError:
+            logger.info("conversation timeout task cancelled before expiry")
+
+    timeout_task = asyncio.create_task(_conversation_timeout_task())
+
+    async def _cancel_timeout_task():
+        if not timeout_task.done():
+            timeout_task.cancel()
+            try:
+                await timeout_task
+            except Exception:
+                pass
+
+    ctx.add_shutdown_callback(_cancel_timeout_task)
+
     # Proactive greeting at session start
     greeting = "Pair Mode activated! What do you want to do?" if mode == "copilot" else "Hi! Ready for a quick learning session?"
     await session.say(greeting, allow_interruptions=False)
