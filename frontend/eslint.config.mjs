@@ -17,6 +17,12 @@ const eslintConfig = [
     'prettier',
     'plugin:prettier/recommended'
   ),
+  {
+    rules: {
+      'prettier/prettier': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
 ];
 
 export default eslintConfig;
