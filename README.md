@@ -8,12 +8,14 @@ Equipped with up‑to‑date knowledge of the ChatGPT interface and features, th
 
 - **Pair Mode (Copilot)**: Practical “pairing” for doing tasks together in ChatGPT. The assistant suggests modes and prompts. Screen sharing is supported and recommended.
 
-- **Lesson mode**: Guided, lightweight curriculum that teaches AI usage. The assistant updates lesson progress and shares short, copyable prompts during the session. Screen sharing is supported and recommended.
+- **Guided Lesson**: Guided, lightweight curriculum that teaches AI usage. The assistant updates lesson progress and shares short, copyable prompts during the session. Screen sharing is supported and recommended.
 
 ## Demo videos
-- Pair Mode: https://youtu.be/QSY_1edU8JY [![Watch the demo](https://img.youtube.com/vi/QSY_1edU8JY/maxresdefault.jpg)](https://youtu.be/QSY_1edU8JY)
-  
-- Guided Lesson: https://youtu.be/MyJ9TKiLvNA [![Watch the demo](https://img.youtube.com/vi/MyJ9TKiLvNA/maxresdefault.jpg)](https://youtu.be/MyJ9TKiLvNA)
+[![Watch the demo](https://img.youtube.com/vi/MyJ9TKiLvNA/maxresdefault.jpg)](https://youtu.be/MyJ9TKiLvNA)
+<br>
+- Pair Mode: https://youtu.be/QSY_1edU8JY
+- Guided Lesson: https://youtu.be/MyJ9TKiLvNA
+
 
 
 ## Getting Started
