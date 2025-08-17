@@ -13,7 +13,7 @@ Equipped with up‑to‑date knowledge of the ChatGPT interface and features, th
 ## Demo videos
 
 - Pair mode (Copilot): [link pending]
-- Lesson mode: [link pending]
+- Lesson mode: [![Watch the demo](https://img.youtube.com/vi/MyJ9TKiLvNA/maxresdefault.jpg)](https://youtu.be/MyJ9TKiLvNA)
 
 
 ## Getting Started
