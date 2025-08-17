@@ -42,12 +42,12 @@ export const Welcome = React.forwardRef<HTMLDivElement, React.ComponentProps<'di
           Use ChatGPT effectively and safely
         </h1>
         <div className="mt-6 flex w-64 flex-col gap-3">
-          <Button variant="primary" size="lg" onClick={onStartLesson} className="w-64 font-mono">
-          Start Guided Lesson
-          </Button>
-          <Button variant="secondary" size="lg" onClick={onStartCopilot} className="w-64 font-mono">
+          <Button variant="primary" size="lg" onClick={onStartCopilot} className="w-64 font-mono">
             Pair Mode
           </Button>
+          <Button variant="secondary" size="lg" onClick={onStartLesson} className="w-64 font-mono">
+          Guided Lesson
+          </Button>          
         </div>
         <p className="text-fg1 m fixed bottom-5 left-1/2 w-full max-w-prose -translate-x-1/2 pt-1 text-xs leading-5 font-normal text-pretty md:text-sm">          
           <a

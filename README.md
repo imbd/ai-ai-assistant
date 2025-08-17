@@ -1,14 +1,17 @@
 # ChatGPT Copilot
 
+Equipped with up‑to‑date knowledge of the ChatGPT interface and features, this assistant helps you use ChatGPT efficiently!
+
 ## Modes
 
+- **Pair Mode (Copilot)**: Practical “pairing” for doing tasks together in ChatGPT. The assistant suggests modes and prompts. Screen sharing is supported and recommended.
+
 - **Lesson mode**: Guided, lightweight curriculum that teaches AI usage. The assistant updates lesson progress and shares short, copyable prompts during the session. Screen sharing is supported and recommended.
-- **Copilot (Pair) mode**: Practical “pairing” workflow for doing tasks together in ChatGPT. The assistant suggests modes and concise prompts. Screen sharing is supported and recommended.
 
 ## Demo videos
 
+- Pair mode (Copilot): [link pending]
 - Lesson mode: [link pending]
-- Copilot mode: [link pending]
 
 
 ## Getting Started
@@ -27,6 +30,7 @@ These projects were adapted from the original LiveKit example templates. See eac
 - **TTS**: OpenAI (voice `echo`)
 - **Portkey (optional)**: Used only as a gateway for routing/observability/visibility. When configured, LLM traffic is routed via Portkey; otherwise the app talks directly to OpenAI. No other STT/TTS providers are used.
 
+Defaults are configurable via environment variables.
 
 ### Backend (Python)
 - Requirements: Python 3.11+, `uv`, or `pip`
@@ -56,6 +60,7 @@ These projects were adapted from the original LiveKit example templates. See eac
 Copy and configure environment variables as needed:
 - Frontend: copy `frontend/.env.example` to `frontend/.env.local`
 - Backend: create `.env` in `backend/` based on service requirements
+- Backend: requires `OPENAI_API_KEY`; Portkey (`PORTKEY_*`) is optional for LLM routing/visibility
 
 ## Attribution
 This project leverages and adapts code from the LiveKit example templates.
